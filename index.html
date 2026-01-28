@@ -1,1 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult ADHD Self-Report Scale (ASRS-V1.1) Screener</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --gray: #F5F5F5;
+            --border: 3px solid var(--black);
+            --shadow: 4px 4px 0px var(--black);
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--gray);
+            color: var(--black);
+            line-height: 1.6;
+            padding: 12px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border: var(--border);
+            border-radius: 15px;
+            padding: 20px 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(18px, 3.5vw, 24px);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .header p {
+            font-size: clamp(12px, 2vw, 14px);
+            line-height: 1.5;
+        }
+
+        .know-more-btn {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: clamp(11px, 2vw, 12px);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0px var(--black);
+        }
+
+        .know-more-btn:hover {
+            background: #333;
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--black);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.open {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border: var(--border);
+            border-radius: 15px;
+            padding: 30px 25px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 8px 8px 0px var(--black);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 15px 20px;
+            margin: -30px -25px 20px -25px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(16px, 3vw, 20px);
+            text-transform: uppercase;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            opacity: 0.8;
+        }
+
+        .modal-content p {
+            font-size: clamp(12px, 2vw, 14px);
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--white);
+            border: var(--border);
+            border-radius: 15px;
+            padding: 25px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 12px 18px;
+            margin: -25px -20px 20px -20px;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(16px, 3vw, 20px);
+            text-transform: uppercase;
+            flex: 1;
+        }
+
+        .score-counter {
+            background: var(--white);
+            color: var(--black);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(14px, 2.5vw, 16px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .score-counter.highlight {
+            background: #FF9933;
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .question-number-badge {
+            display: inline-block;
+            background: var(--white);
+            color: var(--black);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: clamp(11px, 2.2vw, 13px);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: clamp(14px, 2.8vw, 17px);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        /* Radio Options */
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 16px;
+            border: 3px solid var(--black);
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            background: var(--gray);
+            transform: translateX(4px);
+        }
+
+        .radio-option.shaded {
+            background: #FFE6CC;
+        }
+
+        .radio-option.shaded:hover {
+            background: #FFD9B3;
+        }
+
+        .radio-option.selected {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .radio-option.selected.shaded {
+            background: #FF9933;
+            color: var(--white);
+        }
+
+        .radio-option input[type="radio"] {
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            border: 3px solid var(--black);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .radio-option.selected input[type="radio"] {
+            background: var(--white);
+            border-color: var(--white);
+        }
+
+        .radio-option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--black);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio-option.selected input[type="radio"]:checked::after {
+            background: var(--white);
+        }
+
+        .radio-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: clamp(13px, 2.5vw, 14px);
+            letter-spacing: 0.3px;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: clamp(12px, 2.3vw, 14px);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+            box-shadow: 3px 3px 0px var(--black);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--black);
+            background: #333;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+            border: 2px solid var(--black);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--gray);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Results Box */
+        .results-box {
+            background: var(--white);
+            border: var(--border);
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .results-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 20px;
+            margin: -30px -25px 25px -25px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .results-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(20px, 4vw, 28px);
+            text-transform: uppercase;
+        }
+
+        .score-display {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(48px, 12vw, 72px);
+            margin: 20px 0;
+            color: var(--black);
+        }
+
+        .interpretation {
+            font-size: clamp(14px, 2.5vw, 16px);
+            line-height: 1.7;
+            margin: 20px 0;
+        }
+
+        .scoring-info {
+            background: var(--gray);
+            border: 2px solid var(--black);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .scoring-info h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(14px, 2.5vw, 16px);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .scoring-info p {
+            font-size: clamp(12px, 2vw, 14px);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .restart-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: clamp(11px, 1.8vw, 12px);
+            margin-top: 30px;
+            border-top: 2px solid var(--black);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-card.animate {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+                padding: 18px 22px;
+                margin-bottom: 12px;
+            }
+
+            .question-card {
+                padding: 22px 20px;
+                margin-bottom: 12px;
+            }
+
+            .card-header {
+                margin: -22px -20px 15px -20px;
+                padding: 10px 18px;
+            }
+
+            .card-header h2 {
+                font-size: 15px;
+            }
+
+            .score-counter {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .question-number-badge {
+                padding: 5px 12px;
+                margin-bottom: 12px;
+                font-size: 11px;
+            }
+
+            .question-text {
+                font-size: 15px;
+                line-height: 1.4;
+                margin-bottom: 16px;
+            }
+
+            .radio-options {
+                gap: 8px;
+            }
+
+            .radio-option {
+                padding: 11px 14px;
+            }
+
+            .radio-label {
+                font-size: 12px;
+            }
+
+            .nav-buttons {
+                margin-top: 12px;
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Adult ADHD Test</h1>
+            </div>
+            <button class="know-more-btn" onclick="openModal()">Know More</button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal" id="infoModal" onclick="closeModalOnBackdrop(event)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>About this Screener</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <p style="text-align: justify;">Many adults have been living with Adult Attention-Deficit/Hyperactivity Disorder (Adult ADHD) and don't recognize it. Why? Because its symptoms are often mistaken for a stressful life. If you've felt this type of frustration most of your life, you may have Adult ADHD – a condition your doctor can help diagnose and treat.</p>
+                
+                <p style="text-align: justify;">The following questionnaire can be used as a starting point to help you recognize the signs/symptoms of Adult ADHD but it is not meant to replace consultation with a trained healthcare professional. An accurate diagnosis can only be made through a clinical evaluation. Regardless of the questionnaire results, if you have concerns about diagnosis and treatment of Adult ADHD, please discuss your concerns with your physician.</p>
+                
+                <p style="font-size: 11px; opacity: 0.8; text-align: justify;">This Adult Self-Report Scale-V1.1 (ASRS-V1.1) Screener is intended for people aged 18 years or older.</p>
+                <p>Site Author: <a href="https://github.com/shreyazh">shreyazh</a></p>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card" id="questionCard">
+            <div class="card-header">
+                <h2>ASRS-V1.1 Screener</h2>
+                <div class="score-counter" id="scoreCounter">0/6</div>
+            </div>
+
+            <div class="question-number-badge" id="questionBadge">Question 1</div>
+            
+            <div class="question-text" id="questionText"></div>
+
+            <div class="radio-options" id="radioOptions"></div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                    ← Previous
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    Next →
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Box -->
+        <div class="results-box" id="resultsBox">
+            <div class="results-header">
+                <h2>Your Results</h2>
+            </div>
+
+            <div class="score-display" id="scoreDisplay"></div>
+            <div class="interpretation" id="interpretation"></div>
+
+            <div class="scoring-info">
+                <h3>Understanding Your Score</h3>
+                <p><strong>Scoring:</strong> This screener counts responses of "Often" or "Very Often" in the shaded areas.</p>
+                <p><strong>Threshold:</strong> Four (4) or more such responses may indicate symptoms consistent with Adult ADHD.</p>
+                <p><strong>Next Steps:</strong> Regardless of your score, if you have concerns about attention, focus, or behavior, please discuss your symptoms with a qualified healthcare professional for a comprehensive evaluation.</p>
+            </div>
+
+            <button class="btn btn-primary restart-btn" onclick="restartScreener()">
+                Start Over
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>aidADHD</strong> - This screener is not a diagnostic tool. Please consult with a qualified healthcare professional for proper evaluation and diagnosis.</p>
+            <p style="margin-top: 8px; font-size: 10px;">© New York University and Ronald C. Kessler, PhD. All rights reserved</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                text: "How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?",
+                shaded: true
+            },
+            {
+                text: "How often do you have difficulty getting things in order when you have to do a task that requires organization?",
+                shaded: true
+            },
+            {
+                text: "How often do you have problems remembering appointments or obligations?",
+                shaded: true
+            },
+            {
+                text: "When you have a task that requires a lot of thought, how often do you avoid or delay getting started?",
+                shaded: true
+            },
+            {
+                text: "How often do you fidget or squirm with your hands or feet when you have to sit down for a long time?",
+                shaded: true
+            },
+            {
+                text: "How often do you feel overly active and compelled to do things, like you were driven by a motor?",
+                shaded: true
+            }
+        ];
+
+        const options = [
+            { label: "Never", value: 0, shaded: false },
+            { label: "Rarely", value: 1, shaded: false },
+            { label: "Sometimes", value: 2, shaded: false },
+            { label: "Often", value: 3, shaded: true },
+            { label: "Very Often", value: 4, shaded: true }
+        ];
+
+        let currentQuestionIndex = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        function openModal() {
+            document.getElementById('infoModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('open');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnBackdrop(event) {
+            if (event.target.id === 'infoModal') {
+                closeModal();
+            }
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const questionCard = document.getElementById('questionCard');
+            
+            // Add animation
+            questionCard.classList.remove('animate');
+            void questionCard.offsetWidth; // Trigger reflow
+            questionCard.classList.add('animate');
+            
+            // Update question text
+            document.getElementById('questionBadge').textContent = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('questionText').textContent = question.text;
+            
+            // Render radio options
+            const radioContainer = document.getElementById('radioOptions');
+            radioContainer.innerHTML = '';
+            
+            options.forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'radio-option';
+                if (question.shaded && option.shaded) {
+                    label.classList.add('shaded');
+                }
+                
+                // Check if this option is selected
+                if (answers[currentQuestionIndex] === option.value) {
+                    label.classList.add('selected');
+                }
+                
+                label.innerHTML = `
+                    <span class="radio-label">${option.label}</span>
+                    <input type="radio" name="currentQuestion" value="${option.value}" ${answers[currentQuestionIndex] === option.value ? 'checked' : ''}>
+                `;
+                
+                label.onclick = function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                        selectAnswer(option.value);
+                    } else {
+                        selectAnswer(option.value);
+                    }
+                };
+                
+                radioContainer.appendChild(label);
+            });
+            
+            // Update button states
+            updateButtons();
+        }
+
+        function selectAnswer(value) {
+            answers[currentQuestionIndex] = value;
+            
+            // Update visual selection
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            const selectedOption = document.querySelector(`input[value="${value}"]`).closest('.radio-option');
+            selectedOption.classList.add('selected');
+            
+            // Update score counter
+            updateScoreCounter();
+            
+            // Enable next button
+            updateButtons();
+            
+            // Auto-advance after a short delay (optional - can be removed if you prefer manual navigation)
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    nextQuestion();
+                } else {
+                    // Last question - just enable the button
+                    document.getElementById('nextBtn').textContent = 'See Results';
+                }
+            }, 400);
+        }
+
+        function updateScoreCounter() {
+            let shadedCount = 0;
+            answers.forEach((answer, index) => {
+                if (answer !== null && answer >= 3 && questions[index].shaded) {
+                    shadedCount++;
+                }
+            });
+            
+            const scoreCounter = document.getElementById('scoreCounter');
+            const oldCount = parseInt(scoreCounter.textContent.split('/')[0]);
+            
+            scoreCounter.textContent = `${shadedCount}/6`;
+            
+            // Add highlight animation if score changed
+            if (oldCount !== shadedCount) {
+                scoreCounter.classList.add('highlight');
+                setTimeout(() => {
+                    scoreCounter.classList.remove('highlight');
+                }, 300);
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Previous button
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // Next button
+            nextBtn.disabled = answers[currentQuestionIndex] === null;
+            
+            // Change text for last question
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = 'See Results';
+            } else {
+                nextBtn.textContent = 'Next →';
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function showResults() {
+            // Calculate score
+            let shadedCount = 0;
+            answers.forEach((answer, index) => {
+                if (answer >= 3 && questions[index].shaded) {
+                    shadedCount++;
+                }
+            });
+            
+            // Hide question card
+            document.getElementById('questionCard').classList.add('hidden');
+            
+            // Show results
+            const resultsBox = document.getElementById('resultsBox');
+            resultsBox.style.display = 'block';
+            
+            document.getElementById('scoreDisplay').textContent = `${shadedCount} / 6`;
+            
+            const interpretation = document.getElementById('interpretation');
+            if (shadedCount >= 4) {
+                interpretation.innerHTML = `
+                    <strong>Your symptoms may be consistent with Adult ADHD.</strong><br><br>
+                    Four or more checkmarks in the shaded area indicate symptoms that may be consistent with Adult ADHD. 
+                    It may be beneficial for you to talk with your healthcare provider about an evaluation.
+                `;
+            } else {
+                interpretation.innerHTML = `
+                    <strong>Your responses suggest fewer ADHD symptoms.</strong><br><br>
+                    However, if you have concerns about your attention, focus, or behavior, we still recommend 
+                    discussing your symptoms with a qualified healthcare professional for a comprehensive evaluation.
+                `;
+            }
+            
+            // Scroll to results
+            resultsBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function restartScreener() {
+            currentQuestionIndex = 0;
+            answers = new Array(questions.length).fill(null);
+            
+            document.getElementById('resultsBox').style.display = 'none';
+            document.getElementById('questionCard').classList.remove('hidden');
+            
+            // Reset score counter
+            document.getElementById('scoreCounter').textContent = '0/6';
+            
+            renderQuestion();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        renderQuestion();
+    </script>
+</body>
+</html>
